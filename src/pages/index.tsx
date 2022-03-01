@@ -2,8 +2,18 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { getDatabase, ref, set } from "firebase/database";
+import { database } from '../services/firebase';
 
 const Home: NextPage = () => {
+
+
+  function writeUserData(name: string) {
+    const db = database;
+    set(ref(db, 'users'), {
+      username: name,
+    });
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -13,6 +23,8 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+
+        <button type="button" onClick={() => writeUserData('nomeeeeeeeee')}>botaooo</button>
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
