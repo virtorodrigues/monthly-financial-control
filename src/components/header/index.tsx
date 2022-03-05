@@ -1,15 +1,7 @@
-import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Heading, HStack, Stack, useDisclosure, VStack } from "@chakra-ui/react"
-import { useState } from "react";
-import { Items } from "./items"
-import { Show, Hide } from '@chakra-ui/react'
-import { CloseButton } from '@chakra-ui/react'
-import { IconButton } from '@chakra-ui/react'
-import { AiOutlineMenu } from 'react-icons/ai';
+import { Heading, HStack, Stack } from "@chakra-ui/react";
 import { Menu } from "./menu";
 
 export const Header = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (
     <Stack bg='darkPrimaryColor' p={{ base: 5, md: 10 }} justify="center" align="center">
       <HStack

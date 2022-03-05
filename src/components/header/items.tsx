@@ -1,13 +1,26 @@
 import { Heading } from "@chakra-ui/react"
+import { useRouter } from "next/router";
+import { removeAccents } from "../../core/removeAccents";
 
 type ItemProps = {
   title: string;
 }
 
 const Item = ({ title }: ItemProps) => {
+  const route = useRouter();
 
   return (
-    <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
+    <Heading
+      cursor='pointer'
+      color={
+        route.asPath.includes(removeAccents(title).toLocaleLowerCase())
+          ? 'accentColor'
+          : 'text'
+      }
+      as='h2'
+      size='sm'
+      isTruncated
+    >
       {title}
     </Heading>
   )
