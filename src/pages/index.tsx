@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { getDatabase, ref, set } from "firebase/database";
 import { database } from '../services/firebase';
 import { Heading } from '@chakra-ui/react';
+import { Header } from '../components/header';
 
 const Home: NextPage = () => {
 
@@ -14,9 +15,7 @@ const Home: NextPage = () => {
     });
   }
   return (
-    <Heading bg={'secondaryText'}>
-      Hello World!
-    </Heading>
+   <Header />
   )
 }
 
