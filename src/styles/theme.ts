@@ -9,6 +9,7 @@ export const theme = extendTheme({
     primaryText: '#212121',
     secondaryText: '#757575',
     accentColor: '#FFC107',
+    separator: '#BDBDBD',
   },
   fonts: {
     heading: 'Roboto',

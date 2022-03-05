@@ -3,7 +3,7 @@ import { Menu } from "./menu";
 
 export const Header = () => {
   return (
-    <Stack bg='darkPrimaryColor' p={{ base: 5, md: 10 }} justify="center" align="center">
+    <Stack minW='300px' bg='darkPrimaryColor' p={{ base: 5, md: 10 }} justify="center" align="center">
       <HStack
         width="100%"
         maxWidth="1280px"
@@ -20,7 +20,6 @@ export const Header = () => {
             </Heading>
           </HStack>
         </HStack>
-
         <Menu />
       </HStack>
     </Stack >
