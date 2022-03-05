@@ -1,20 +1,7 @@
-
-
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerOverlay,
-  HStack,
-  IconButton,
-  Show,
-  useDisclosure,
-  VStack
-} from "@chakra-ui/react";
+import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerOverlay, HStack, IconButton, Show, useDisclosure, VStack } from "@chakra-ui/react"
+import { Items } from './items';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { useBreakpointValue } from '@chakra-ui/react'
-import { Items } from './items';
 
 export const Menu = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
