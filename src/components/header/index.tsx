@@ -1,8 +1,17 @@
-import { Heading, HStack, Stack } from "@chakra-ui/react"
+import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Heading, HStack, Stack, useDisclosure, VStack } from "@chakra-ui/react"
+import { useState } from "react";
+import { Items } from "./items"
+import { Show, Hide } from '@chakra-ui/react'
+import { CloseButton } from '@chakra-ui/react'
+import { IconButton } from '@chakra-ui/react'
+import { AiOutlineMenu } from 'react-icons/ai';
+import { Menu } from "./menu";
 
 export const Header = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
-    <Stack bg='darkPrimaryColor' p={10} justify="center" align="center">
+    <Stack bg='darkPrimaryColor' p={{ base: 5, md: 10 }} justify="center" align="center">
       <HStack
         width="100%"
         maxWidth="1280px"
@@ -20,24 +29,8 @@ export const Header = () => {
           </HStack>
         </HStack>
 
-        <HStack spacing={12}>
-          <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
-            Overview
-          </Heading>
-          <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
-            Saídas
-          </Heading>
-          <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
-            Entradas
-          </Heading>
-          <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
-            Onde tenho dinheiro
-          </Heading>
-          <Heading cursor='pointer' color='text' as='h2' size='sm' isTruncated>
-            Entrar
-          </Heading>
-        </HStack>
+        <Menu />
       </HStack>
-    </Stack>
+    </Stack >
   )
 }
