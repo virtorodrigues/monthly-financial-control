@@ -14,7 +14,7 @@ const Home: NextPage = () => {
     });
   }
   return (
-    <Heading>
+    <Heading bg={'secondaryText'}>
       Hello World!
     </Heading>
   )
