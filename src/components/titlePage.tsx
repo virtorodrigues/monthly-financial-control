@@ -10,7 +10,7 @@ export const TitlePage = () => {
       direction='row'
       justify='space-between'
       borderBottom={'1px solid'}
-      borderBottomColor='separator'
+      borderBottomColor='rgb(189, 189, 189, 0.4)'
       pb={{ base: '10px', lg: '30px' }}
       mb={{ base: '25px', lg: '40px' }}
     >

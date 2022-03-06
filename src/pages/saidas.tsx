@@ -4,14 +4,15 @@ import { TextField } from "../components/form/textField";
 import { ButtonPrimary } from "../components/form/buttonPrimary";
 import { ButtonSecondary } from "../components/form/buttonSecondary";
 import { TitlePage } from "../components/titlePage";
+import { Login } from "../components/login";
 
 export default function Saidas() {
 
   return (
     <>
       <Header />
-
-      <Stack  minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
+      <Login />
+      <Stack minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
         <TitlePage />
         <Stack
           maxW='1280px'
