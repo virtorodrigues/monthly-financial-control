@@ -1,21 +1,22 @@
-import { FormEvent } from 'react';
-import { Button, FormControl, FormControlProps, HStack, Stack, Text, useBreakpointValue, useDisclosure, VStack } from "@chakra-ui/react";
+import { useState } from 'react';
+import { HStack, Stack, Text, useBreakpointValue, VStack } from "@chakra-ui/react";
 import { Header } from "../components/header";
 import { TextField } from "../components/form/textField";
 import { ButtonPrimary } from "../components/form/buttonPrimary";
-import { ButtonSecondary } from "../components/form/buttonSecondary";
 import { TitlePage } from "../components/titlePage";
 import { Login } from "../components/login";
 import { SelectField } from "../components/form/selectField";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SubmitHandler, useForm, Resolver } from 'react-hook-form'
+import { database } from '../services/firebase';
+import { push, ref, set } from 'firebase/database';
 
 
 type CreateMoneyOutProps = {
   year: string;
   month: string;
-  title: string;
+  description?: string;
   paymentType: string;
   moneyComeFrom: string;
   date: string;
@@ -26,9 +27,9 @@ type CreateMoneyOutProps = {
 const OptionsMonth = () => {
   return (
     <>
+      <option>Março</option>
       <option>Janeiro</option>
       <option>Fevereiro</option>
-      <option>Março</option>
       <option>Abril</option>
       <option>Maio</option>
       <option>Junho</option>
@@ -55,11 +56,10 @@ const OptionsYear = () => {
 const OptionsPaymentType = () => {
   return (
     <>
-      <option>Crédito</option>
-      <option>Débito</option>
       <option>Pix</option>
       <option>Boleto</option>
       <option>Dinheiro</option>
+      <option>Débito</option>
     </>
   )
 };
@@ -76,7 +76,7 @@ const OptionsPaymentFixed = () => {
 const createMoneyOutFormSchema = yup.object({
   year: yup.string().required('Campo obrigatório'),
   month: yup.string().required('Campo obrigatório'),
-  title: yup.string().required('Campo obrigatório'),
+  //description: yup.string().required('Campo obrigatório'),
   paymentType: yup.string().required('Campo obrigatório'),
   moneyComeFrom: yup.string().required('Campo obrigatório'),
   date: yup.string().required('Campo obrigatório'),
@@ -85,10 +85,12 @@ const createMoneyOutFormSchema = yup.object({
 });
 
 export default function Saidas() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const fieldsVariant = useBreakpointValue({ base: 'outline', lg: 'unstyled' });
   const textAdd = useBreakpointValue({ base: 'Adicionar', lg: '+' });
 
-  const { register, handleSubmit, formState } = useForm<CreateMoneyOutProps>({
+  const { register, handleSubmit, reset, formState } = useForm<CreateMoneyOutProps>({
     resolver: yupResolver(createMoneyOutFormSchema)
   });
 
@@ -96,8 +98,36 @@ export default function Saidas() {
 
   const handleCreateMoneyOut: SubmitHandler<CreateMoneyOutProps> = async (values) => {
     console.log(values);
-    console.log(errors);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(true);
+
+    const outMoneyListRef = ref(database, `/outMoney`);
+    const outMoneyRef = push(outMoneyListRef);
+
+    set(outMoneyRef, {
+      year: values.year,
+      month: values.month,
+      description: values.description,
+      paymentType: values.paymentType,
+      moneyComeFrom: values.moneyComeFrom,
+      date: values.date,
+      price: values.price,
+      paymentFixed: values.paymentFixed,
+    });
+
+    reset({
+      year: '2022',
+      month: 'Março',
+      description: '',
+      paymentType: 'Pix',
+      moneyComeFrom: '',
+      date: '',
+      price: '',
+      paymentFixed: 'Não fixo',
+    });
+
+    await new Promise(resolve => setTimeout(() => {
+      setIsLoading(false);
+    }, 2000));
   }
 
   return (
@@ -153,14 +183,7 @@ export default function Saidas() {
               direction={{ base: 'column', lg: 'row' }}
               align='baseline'
             >
-              <TextField
-                id="title"
-                type="text"
-                placeholder="Titulo. Ex: fatura"
-                variant={fieldsVariant}
-                {...register("title")}
-                error={errors.title}
-              />
+
               <SelectField
                 id="paymentType"
                 options={<OptionsPaymentType />}
@@ -199,7 +222,16 @@ export default function Saidas() {
                 {...register("paymentFixed")}
                 error={errors.paymentFixed}
               />
-              <ButtonPrimary text={textAdd} type="submit" />
+              <TextField
+                id="description"
+                type="text"
+                placeholder="Descrição (opcional)"
+                variant={fieldsVariant}
+                {...register("description")}
+                error={errors.description}
+              />
+
+              <ButtonPrimary text={textAdd} type="submit" isLoading={isLoading} />
             </Stack>
           </VStack>
         </Stack>
