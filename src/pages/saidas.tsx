@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { HStack, Stack, Text, useBreakpointValue, VStack } from "@chakra-ui/react";
 import { Header } from "../components/header";
 import { TextField } from "../components/form/textField";
@@ -10,10 +10,11 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SubmitHandler, useForm, Resolver } from 'react-hook-form'
 import { database } from '../services/firebase';
-import { push, ref, set } from 'firebase/database';
+import { onValue, push, ref, set } from 'firebase/database';
 
 
 type CreateMoneyOutProps = {
+  key?: string;
   year: string;
   month: string;
   description?: string;
@@ -86,6 +87,7 @@ const createMoneyOutFormSchema = yup.object({
 
 export default function Saidas() {
   const [isLoading, setIsLoading] = useState(false);
+  const [listMoneyOut, setListMoneyOut] = useState<CreateMoneyOutProps[]>([]);
 
   const fieldsVariant = useBreakpointValue({ base: 'outline', lg: 'unstyled' });
   const textAdd = useBreakpointValue({ base: 'Adicionar', lg: '+' });
@@ -95,6 +97,29 @@ export default function Saidas() {
   });
 
   const { errors } = formState;
+
+  useEffect(() => {
+    //outMoney
+
+    const firebaseRef = ref(database, `/outMoney`);
+    onValue(firebaseRef, (snapshot) => {
+      const data = snapshot.val();
+
+      const dataFormatted = Object.entries(data).map(outMoney => {
+
+        return ({
+          ...outMoney[1] as CreateMoneyOutProps,
+          key: outMoney[0],
+        })
+      });
+
+      console.log(dataFormatted)
+      setListMoneyOut(dataFormatted);
+
+    });
+
+  }, []);
+
 
   const handleCreateMoneyOut: SubmitHandler<CreateMoneyOutProps> = async (values) => {
     console.log(values);
@@ -127,7 +152,7 @@ export default function Saidas() {
 
     await new Promise(resolve => setTimeout(() => {
       setIsLoading(false);
-    }, 2000));
+    }, 200));
   }
 
   return (
@@ -136,6 +161,7 @@ export default function Saidas() {
       <Login />
       <Stack minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
         <TitlePage />
+
         <Stack
           maxW='1280px'
           w="full"
@@ -174,6 +200,30 @@ export default function Saidas() {
                 error={errors.month}
               />
             </HStack>
+
+            {!!listMoneyOut.length && (
+              <Stack spacing={8} w='full'>
+                {listMoneyOut.map((outMoney) => (
+                  <Stack
+                    w='full'
+                    key={outMoney.key}
+                    direction="row"
+                    borderBottom={{ lg: '1px solid' }}
+                    borderBottomColor={{ lg: 'rgb(189, 189, 189, 0.4)' }}
+                    spacing={3}
+                    pb={'8px'}>
+                    <Text flex={1}>{outMoney.paymentType}</Text>
+                    <Text flex={1}>{outMoney.moneyComeFrom}</Text>
+                    <Text flex={1}>{outMoney.date}</Text>
+                    <Text flex={1}>{outMoney.price}</Text>
+                    <Text flex={1}>{outMoney.paymentFixed}</Text>
+                    <Text flex={1}>{outMoney.description}</Text>
+                  </Stack>
+                ))}
+
+              </Stack>
+            )}
+
             <Stack
               w='full'
               spacing={5}
