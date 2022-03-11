@@ -160,7 +160,7 @@ export default function Saidas() {
       <Header />
       <Login />
       <Stack minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
-        <TitlePage />
+        <TitlePage title={'Saídas'} />
 
         <Stack
           maxW='1280px'

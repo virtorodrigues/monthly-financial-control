@@ -1,7 +1,11 @@
 import { Heading, Stack } from '@chakra-ui/react'
 import { ButtonPrimary } from './form/buttonPrimary'
 
-export const TitlePage = () => {
+type TitlePageProps = {
+  title: string;
+}
+
+export const TitlePage = ({ title }: TitlePageProps) => {
 
   return (
     <Stack
@@ -15,7 +19,7 @@ export const TitlePage = () => {
       mb={{ base: '25px', lg: '40px' }}
     >
       <Heading as='h1' size='2xl' fontWeight='regular'>
-        Saídas
+        {title}
       </Heading>
       <ButtonPrimary />
     </Stack>

@@ -8,13 +8,15 @@ import { ItemProps } from "../../core/types";
 const Item = ({ title, action }: ItemProps) => {
   const route = useRouter();
 
+  const titleFormatted = removeAccents(title).toLocaleLowerCase().replace(" ", "-");
+
   if (action) {
     return (
       <Heading
         onClick={action}
         cursor='pointer'
         color={
-          route.asPath.includes(removeAccents(title).toLocaleLowerCase())
+          route.asPath.includes(titleFormatted)
             ? 'accentColor'
             : 'text'
         }
@@ -28,9 +30,9 @@ const Item = ({ title, action }: ItemProps) => {
   }
 
   return (
-    <Link href={`/${removeAccents(title).toLocaleLowerCase()}`}>
+    <Link href={`/${titleFormatted}`}>
       <Heading color={
-        route.asPath.includes(removeAccents(title).toLocaleLowerCase())
+        route.asPath.includes(titleFormatted)
           ? 'accentColor'
           : 'text'
       }
@@ -52,7 +54,7 @@ export const Items = () => {
       <Item title="Overview" />
       <Item title="Saídas" />
       <Item title="Entradas" />
-      <Item title="Onde tenho dinheiro" />
+      <Item title="Meus Bancos" />
       <Item title="Entrar" action={handleOnOpen} />
     </>
   )
