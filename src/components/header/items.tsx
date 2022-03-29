@@ -8,7 +8,7 @@ import { ItemProps } from "../../core/types";
 const Item = ({ title, action }: ItemProps) => {
   const route = useRouter();
 
-  const titleFormatted = removeAccents(title).toLocaleLowerCase().replace(" ", "-");
+  const titleFormatted = removeAccents(title).toLocaleLowerCase().replace(/\s/g, '-');
 
   if (action) {
     return (
@@ -54,6 +54,7 @@ export const Items = () => {
       <Item title="Overview" />
       <Item title="Saídas" />
       <Item title="Entradas" />
+      <Item title="Fatura cartão de crédito" />
       <Item title="Meus Bancos" />
       <Item title="Entrar" action={handleOnOpen} />
     </>

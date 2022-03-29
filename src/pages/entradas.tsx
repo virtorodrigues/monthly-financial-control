@@ -12,16 +12,16 @@ import { SubmitHandler, useForm, Resolver } from 'react-hook-form'
 import { database } from '../services/firebase';
 import { onValue, push, ref, set } from 'firebase/database';
 
+
 type CreateMoneyOutProps = {
   key?: string;
   year: string;
   month: string;
-  description?: string;
-  paymentType: string;
-  moneyComeFrom: string;
-  date: string;
+  bank: string;
   price: string;
-  paymentFixed: string;
+  paymentType: string;
+  date: string;
+  description?: string;
 };
 
 const OptionsMonth = () => {
@@ -78,10 +78,9 @@ const createMoneyOutFormSchema = yup.object({
   month: yup.string().required('Campo obrigatório'),
   //description: yup.string().required('Campo obrigatório'),
   paymentType: yup.string().required('Campo obrigatório'),
-  moneyComeFrom: yup.string().required('Campo obrigatório'),
+  bank: yup.string().required('Campo obrigatório'),
   date: yup.string().required('Campo obrigatório'),
   price: yup.string().required('Campo obrigatório'),
-  paymentFixed: yup.string().required('Campo obrigatório'),
 });
 
 export default function Saidas() {
@@ -133,10 +132,9 @@ export default function Saidas() {
       month: values.month,
       description: values.description,
       paymentType: values.paymentType,
-      moneyComeFrom: values.moneyComeFrom,
+      bank: values.bank,
       date: values.date,
       price: values.price,
-      paymentFixed: values.paymentFixed,
     });
 
     reset({
@@ -144,10 +142,9 @@ export default function Saidas() {
       month: 'Março',
       description: '',
       paymentType: 'Pix',
-      moneyComeFrom: '',
+      bank: '',
       date: '',
       price: '',
-      paymentFixed: 'Não fixo',
     });
 
     await new Promise(resolve => setTimeout(() => {
@@ -160,7 +157,7 @@ export default function Saidas() {
       <Header />
       <Login />
       <Stack minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
-        <TitlePage title={'Saídas'} />
+        <TitlePage title={'Entradas'} />
 
         <Stack
           maxW='1280px'
@@ -173,7 +170,7 @@ export default function Saidas() {
           spacing={{ base: 7, lg: 9 }}
         >
           <Text as='h2' fontSize="2xl" fontWeight='bold' color='secondaryText'>
-            Adicionar saída
+            Adicionar entrada
           </Text>
 
           <VStack
@@ -213,10 +210,9 @@ export default function Saidas() {
                     spacing={3}
                     pb={'8px'}>
                     <Text flex={1}>{outMoney.paymentType}</Text>
-                    <Text flex={1}>{outMoney.moneyComeFrom}</Text>
+                    <Text flex={1}>{outMoney.bank}</Text>
                     <Text flex={1}>{outMoney.date}</Text>
                     <Text flex={1}>{outMoney.price}</Text>
-                    <Text flex={1}>{outMoney.paymentFixed}</Text>
                     <Text flex={1}>{outMoney.description}</Text>
                   </Stack>
                 ))}
@@ -242,12 +238,12 @@ export default function Saidas() {
                 error={errors.paymentType}
               />
               <TextField
-                id="moneyComeFrom"
+                id="bank"
                 type="text"
                 placeholder="De onde saiu?"
                 variant={fieldsVariant}
-                {...register("moneyComeFrom")}
-                error={errors.moneyComeFrom}
+                {...register("bank")}
+                error={errors.bank}
               />
               <TextField
                 id="date"
@@ -264,13 +260,6 @@ export default function Saidas() {
                 variant={fieldsVariant}
                 {...register("price")}
                 error={errors.price}
-              />
-              <SelectField
-                id="paymentFixed"
-                options={<OptionsPaymentFixed />}
-                variant={fieldsVariant}
-                {...register("paymentFixed")}
-                error={errors.paymentFixed}
               />
               <TextField
                 id="description"

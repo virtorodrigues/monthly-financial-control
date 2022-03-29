@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { HStack, Stack, Text, useBreakpointValue, VStack } from "@chakra-ui/react";
 import { Header } from "../components/header";
 import { TextField } from "../components/form/textField";
@@ -12,16 +12,18 @@ import { SubmitHandler, useForm, Resolver } from 'react-hook-form'
 import { database } from '../services/firebase';
 import { onValue, push, ref, set } from 'firebase/database';
 
-type CreateMoneyOutProps = {
+type CreditCardBillProps = {
   key?: string;
+  billState: string;
+  price: string;
+  myBank: string;
   year: string;
   month: string;
-  description?: string;
-  paymentType: string;
-  moneyComeFrom: string;
-  date: string;
-  price: string;
-  paymentFixed: string;
+};
+
+type MyBankProps = {
+  key?: string;
+  name: string;
 };
 
 const OptionsMonth = () => {
@@ -53,22 +55,11 @@ const OptionsYear = () => {
   )
 };
 
-const OptionsPaymentType = () => {
+const OptionsBillState = () => {
   return (
     <>
-      <option>Pix</option>
-      <option>Boleto</option>
-      <option>Dinheiro</option>
-      <option>Débito</option>
-    </>
-  )
-};
-
-const OptionsPaymentFixed = () => {
-  return (
-    <>
-      <option>Não fixo</option>
-      <option>Fixo</option>
+      <option>Aberta</option>
+      <option>Fechada</option>
     </>
   )
 };
@@ -76,78 +67,85 @@ const OptionsPaymentFixed = () => {
 const createMoneyOutFormSchema = yup.object({
   year: yup.string().required('Campo obrigatório'),
   month: yup.string().required('Campo obrigatório'),
-  //description: yup.string().required('Campo obrigatório'),
-  paymentType: yup.string().required('Campo obrigatório'),
-  moneyComeFrom: yup.string().required('Campo obrigatório'),
-  date: yup.string().required('Campo obrigatório'),
   price: yup.string().required('Campo obrigatório'),
-  paymentFixed: yup.string().required('Campo obrigatório'),
+  myBank: yup.string().required('Campo obrigatório'),
+  billState: yup.string().required('Campo obrigatório'),
 });
 
 export default function Saidas() {
   const [isLoading, setIsLoading] = useState(false);
-  const [listMoneyOut, setListMoneyOut] = useState<CreateMoneyOutProps[]>([]);
+  const [creditCardBill, setCreditCardBill] = useState<CreditCardBillProps[]>([]);
+  const [myBanks, setMyBanks] = useState<MyBankProps[]>([]);
 
   const fieldsVariant = useBreakpointValue({ base: 'outline', lg: 'unstyled' });
   const textAdd = useBreakpointValue({ base: 'Adicionar', lg: '+' });
 
-  const { register, handleSubmit, reset, formState } = useForm<CreateMoneyOutProps>({
+  const { register, handleSubmit, reset, formState } = useForm<CreditCardBillProps>({
     resolver: yupResolver(createMoneyOutFormSchema)
   });
 
   const { errors } = formState;
 
   useEffect(() => {
-    //outMoney
+    const myBankRef = ref(database, `/myBanks`);
+    onValue(myBankRef, (snapshot) => {
+      const data = snapshot.val();
 
-    const firebaseRef = ref(database, `/outMoney`);
+      if (data) {
+        const dataFormatted = data ? Object.entries(data).map(myBanks => {
+
+          return ({
+            ...myBanks[1] as MyBankProps,
+            key: myBanks[0],
+          })
+        }) : [];
+
+        setMyBanks(dataFormatted);
+      }
+    });
+
+
+    const firebaseRef = ref(database, `/creditCardBill`);
     onValue(firebaseRef, (snapshot) => {
       const data = snapshot.val();
 
-      const dataFormatted = data ? Object.entries(data).map(outMoney => {
+      if (data) {
+        const dataFormatted = data ? Object.entries(data).map(myBanks => {
 
-        return ({
-          ...outMoney[1] as CreateMoneyOutProps,
-          key: outMoney[0],
-        })
-      })
-        : [];
+          return ({
+            ...myBanks[1] as CreditCardBillProps,
+            key: myBanks[0],
+          })
+        }) : [];
 
-      console.log(dataFormatted)
-      setListMoneyOut(dataFormatted);
-
+        setCreditCardBill(dataFormatted);
+      }
     });
 
   }, []);
 
+  const MyBank = () => (
+    !!myBanks.length
+      ? <>{myBanks.map((bank) => <option key={bank.key}>{bank.name}</option>)}</>
+      : <option>Cadastre ao menos um banco</option >
+  )
 
-  const handleCreateMoneyOut: SubmitHandler<CreateMoneyOutProps> = async (values) => {
-    console.log(values);
+  const handleCreateMoneyOut: SubmitHandler<CreditCardBillProps> = async (values) => {
     setIsLoading(true);
 
-    const outMoneyListRef = ref(database, `/outMoney`);
-    const outMoneyRef = push(outMoneyListRef);
+    const myBankListRef = ref(database, `/creditCardBill`);
+    const myBankRef = push(myBankListRef);
 
-    set(outMoneyRef, {
+    set(myBankRef, {
       year: values.year,
       month: values.month,
-      description: values.description,
-      paymentType: values.paymentType,
-      moneyComeFrom: values.moneyComeFrom,
-      date: values.date,
       price: values.price,
-      paymentFixed: values.paymentFixed,
+      myBank: values.myBank,
+      billState: values.billState,
     });
 
     reset({
-      year: '2022',
-      month: 'Março',
-      description: '',
-      paymentType: 'Pix',
-      moneyComeFrom: '',
-      date: '',
       price: '',
-      paymentFixed: 'Não fixo',
     });
 
     await new Promise(resolve => setTimeout(() => {
@@ -160,7 +158,7 @@ export default function Saidas() {
       <Header />
       <Login />
       <Stack minW='300px' my={'40px'} w="full" align={"center"} px={{ base: '20px', md: '40px' }}>
-        <TitlePage title={'Saídas'} />
+        <TitlePage title={'Fatura do cartão de crédito'} />
 
         <Stack
           maxW='1280px'
@@ -173,7 +171,7 @@ export default function Saidas() {
           spacing={{ base: 7, lg: 9 }}
         >
           <Text as='h2' fontSize="2xl" fontWeight='bold' color='secondaryText'>
-            Adicionar saída
+            Adicionar fatura do cartão de crédito
           </Text>
 
           <VStack
@@ -184,6 +182,7 @@ export default function Saidas() {
             justify="flex-start"
             direction={{ base: 'column', lg: 'row' }}
           >
+
             <HStack spacing={5} direction="column" >
               <SelectField
                 id="year"
@@ -201,23 +200,20 @@ export default function Saidas() {
               />
             </HStack>
 
-            {!!listMoneyOut.length && (
+            {!!creditCardBill.length && (
               <Stack spacing={8} w='full'>
-                {listMoneyOut.map((outMoney) => (
+                {creditCardBill.map((creditBill) => (
                   <Stack
                     w='full'
-                    key={outMoney.key}
+                    key={creditBill.key}
                     direction="row"
                     borderBottom={{ lg: '1px solid' }}
                     borderBottomColor={{ lg: 'rgb(189, 189, 189, 0.4)' }}
                     spacing={3}
                     pb={'8px'}>
-                    <Text flex={1}>{outMoney.paymentType}</Text>
-                    <Text flex={1}>{outMoney.moneyComeFrom}</Text>
-                    <Text flex={1}>{outMoney.date}</Text>
-                    <Text flex={1}>{outMoney.price}</Text>
-                    <Text flex={1}>{outMoney.paymentFixed}</Text>
-                    <Text flex={1}>{outMoney.description}</Text>
+                    <Text flex={1}>{creditBill.myBank}</Text>
+                    <Text flex={1}>{creditBill.price}</Text>
+                    <Text flex={1}>{creditBill.billState}</Text>
                   </Stack>
                 ))}
 
@@ -233,52 +229,29 @@ export default function Saidas() {
               direction={{ base: 'column', lg: 'row' }}
               align='baseline'
             >
-
               <SelectField
-                id="paymentType"
-                options={<OptionsPaymentType />}
+                id="myBank"
+                options={<MyBank />}
                 variant={fieldsVariant}
-                {...register("paymentType")}
-                error={errors.paymentType}
+                {...register("myBank")}
+                error={errors.myBank}
               />
-              <TextField
-                id="moneyComeFrom"
-                type="text"
-                placeholder="De onde saiu?"
-                variant={fieldsVariant}
-                {...register("moneyComeFrom")}
-                error={errors.moneyComeFrom}
-              />
-              <TextField
-                id="date"
-                type="date"
-                placeholder="Data"
-                variant={fieldsVariant}
-                {...register("date")}
-                error={errors.date}
-              />
+
               <TextField
                 id="price"
                 type="number"
-                placeholder="Valor"
+                placeholder="Valor atual da fatura"
                 variant={fieldsVariant}
                 {...register("price")}
                 error={errors.price}
               />
+
               <SelectField
-                id="paymentFixed"
-                options={<OptionsPaymentFixed />}
+                id="billState"
+                options={<OptionsBillState />}
                 variant={fieldsVariant}
-                {...register("paymentFixed")}
-                error={errors.paymentFixed}
-              />
-              <TextField
-                id="description"
-                type="text"
-                placeholder="Descrição (opcional)"
-                variant={fieldsVariant}
-                {...register("description")}
-                error={errors.description}
+                {...register("billState")}
+                error={errors.billState}
               />
 
               <ButtonPrimary text={textAdd} type="submit" isLoading={isLoading} />

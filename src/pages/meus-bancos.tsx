@@ -12,7 +12,6 @@ import { SubmitHandler, useForm, Resolver } from 'react-hook-form'
 import { database } from '../services/firebase';
 import { onValue, push, ref, set } from 'firebase/database';
 
-
 type MyBankProps = {
   key?: string;
   name: string;
@@ -45,13 +44,13 @@ export default function Saidas() {
       const data = snapshot.val();
 
       if (data) {
-        const dataFormatted = Object.entries(data).map(myBanks => {
+        const dataFormatted = data ? Object.entries(data).map(myBanks => {
 
           return ({
             ...myBanks[1] as MyBankProps,
             key: myBanks[0],
           })
-        });
+        }) : [];
 
         console.log(dataFormatted)
         setListMyBank(dataFormatted);
